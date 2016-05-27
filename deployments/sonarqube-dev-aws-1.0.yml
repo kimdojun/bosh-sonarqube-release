@@ -1,0 +1,95 @@
+<%
+director_uuid ='0bc8d3c2-e032-4c7e-a99c-e23eea7091fc'
+sonarqube_public_ip =
+sonarqube_private_ip =
+mariadb_ip = 
+subnet_id = 'subnet-6489fe4e'
+
+%>
+---
+name: sonarqube-release
+
+release:
+  name: sonarqube-release
+  version: latest
+
+director_uuid: <%=director_uuid%>
+
+compilation:
+  cloud_properties:
+    instance_type: m1.small
+  network: private_network
+  reuse_compilation_vms: true
+  workers: 3
+
+update:
+  canaries: 1
+  canary_watch_time: 120000
+  update_watch_time: 120000
+  max_in_flight: 4
+
+networks:
+- name: private_network
+  subnets:
+  - cloud_properties:
+      subnet: <%=subnet_id%>
+      security_groups:
+      - 
+      - 
+    dns:
+    - 8.8.8.8
+    gateway: 10.0.0.1
+    range: 10.0.0.0/24
+    name: default_unused
+    range: 10.0.0.0/16
+    reserved:
+    - 
+    static:
+    - 10.30.80.0 - 10.30.80.255
+  type: manual
+
+- name: public_network
+  type: vip
+  cloud_properties: {}
+
+resource_pools:
+- name: small
+  network: private_network
+  stemcell:
+    name: bosh-aws-xen-ubuntu-trusty-go_agent
+    version: 3147
+  cloud_properties:
+    instance_type: m1.small
+
+jobs:
+- name: mariadb
+  instances: 1
+  persistent_disk: 8192
+  template: mariadb
+  resource_pool: small
+  networks:
+  - name: private_network
+    static_ips: <%=mariadb_ip%>
+  properties:
+    admin_username: root
+    admin_password: openpaas
+    sonar_username: sonar
+    sonar_password: sonar
+
+- name: sonarqube
+  template: sonarqube
+  instances: 1
+  resource_pool: small
+  networks:
+  - name: private_network
+    default: [dns, gateway]
+    static_ips: <%=sonarqube_private_ip%>
+  - name: public_network
+    static_ips: <%=sonarqube_public_ip%>
+  properties:
+    sonar_username: sonar
+    sonar_password: sonar
+    sonar_port: 9000
+    mariadb_ip: <%=mariadb_ip%>
+  depends_on:
+  - mariadb

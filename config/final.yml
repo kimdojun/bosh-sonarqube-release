@@ -1,0 +1,6 @@
+---
+blobstore:
+  provider: local
+  options:
+    blobstore_path: /tmp/sonarqube-blobs
+final_name: sonarqube-release

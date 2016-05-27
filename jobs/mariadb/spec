@@ -1,0 +1,19 @@
+---
+name: mariadb
+templates:
+  bin/mariadb_ctl: bin/mariadb_ctl
+  config/my.cnf: config/my.cnf
+  config/mariadb_init.erb: config/mariadb_init
+
+packages:
+  - mariadb
+
+properties:
+  admin_username:
+    default: 'root'
+  admin_password:
+    default: 'paasta'
+  sonar_username:
+    default: 'sonar'
+  sonar_password:
+    default: 'sonar'

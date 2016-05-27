@@ -1,0 +1,7 @@
+---
+name: sonarqube
+
+dependencies:
+
+files:
+  - sonarqube/sonarqube-5.4.zip

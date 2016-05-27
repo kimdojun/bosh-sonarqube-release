@@ -1,0 +1,12 @@
+# abort script on any command that exits with a non zero value
+#set -e -x
+set -eux
+
+echo "Extracting sonarqube files..."
+
+#sudo apt-get update -y
+#echo "c1oudc0w"
+#sudo apt-get install unzip -y
+#echo "c1oudc0w"
+
+unzip sonarqube/sonarqube-5.4.zip -d ${BOSH_INSTALL_TARGET}

@@ -1,0 +1,26 @@
+---
+name: sonarqube
+dependencies:
+  - mariadb
+
+templates:
+  bin/pre-start: bin/pre-start
+  bin/sonarqube_ctl: bin/sonarqube_ctl
+  conf/sonar.properties.erb: conf/sonar.properties
+  conf/wrapper.conf: conf/wrapper.conf
+  helpers/ctl_setup.sh: helpers/ctl_setup.sh
+  helpers/ctl_utils.sh: helpers/ctl_utils.sh
+
+packages:
+  - sonarqube
+  - java8
+
+properties:
+  sonar_username:
+    default: 'sonar'
+  sonar_password:
+    default: 'sonar'
+  sonar_port:
+    default: 9000
+  mariadb_ip:
+    default: 'localhost'

@@ -1,0 +1,92 @@
+---
+name: sonarqube-release-test
+
+release:
+  name: sonarqube-release-test
+  version: latest
+
+director_uuid: 0bc8d3c2-e032-4c7e-a99c-e23eea7091fc
+compilation:
+  workers: 3
+  network: default
+  reuse_compilation_vms: true
+  cloud_properties:
+    ram: 4096
+    disk: 8192
+    cpu: 2
+update:
+  canaries: 1
+  canary_watch_time: 120000
+  update_watch_time: 120000
+  max_in_flight: 4
+networks:
+- name: default
+  subnets:
+  - cloud_properties:
+      name: Internal
+    dns:
+    - 10.30.20.24
+    - 8.8.8.8
+    gateway: 10.30.20.23
+    name: default_unused
+    range: 10.30.0.0/16
+    reserved:
+    - 10.30.20.0 - 10.30.20.22
+    - 10.30.20.25 - 10.30.70.255
+    static:
+    - 10.30.80.0 - 10.30.80.255
+- name: sonarqube_public_network
+  type: manual
+  subnets:
+  - cloud_properties:
+      name: External
+    dns:
+    - 8.8.8.8
+    gateway: 115.68.46.177
+    range: 115.68.46.176/28
+    static:
+    - 115.68.46.185
+resource_pools:
+- name: resource_pools
+  network: default
+  stemcell:
+    name: bosh-vsphere-esxi-ubuntu-trusty-go_agent
+    version: 3147
+  cloud_properties:
+    cpu: 1
+    disk: 4048
+    ram: 2048
+jobs:
+- name: mariadb
+  instances: 1
+  persistent_disk: 8192
+  template: mariadb
+  resource_pool: resource_pools
+  networks:
+  - name: default
+    static_ips: 10.30.80.24
+  properties:
+    admin_username: root
+    admin_password: openpaas
+    sonar_username: sonar
+    sonar_password: sonar
+- name: sonarqube
+  template: sonarqube
+  instances: 1
+  resource_pool: resource_pools
+  networks:
+  - name: default
+    static_ips:
+    - 10.30.80.23
+  - name: sonarqube_public_network
+    default:
+    - dns
+    - gateway
+    static_ips: 115.68.46.185
+  properties:
+    sonar_username: sonar
+    sonar_password: sonar
+    sonar_port: 9000
+    mariadb_ip: 10.30.80.24
+  depends_on:
+  - mariadb
