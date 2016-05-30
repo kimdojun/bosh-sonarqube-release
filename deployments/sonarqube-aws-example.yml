@@ -41,7 +41,7 @@ networks:
   cloud_properties: {}
 
 resource_pools:
-- name: m3-medium
+- name: t2-medium
   network: private_network
   stemcell:
     name: bosh-aws-xen-hvm-ubuntu-trusty-go_agent
@@ -54,7 +54,7 @@ jobs:
   instances: 1
   template: mariadb
   persistent_disk: 8192
-  resource_pool: m3-medium
+  resource_pool: t2-medium
   networks:
   - name: private_network
     static_ips: 10.0.0.32
@@ -67,7 +67,7 @@ jobs:
 - name: sonarqube
   template: sonarqube
   instances: 1
-  resource_pool: m3-medium
+  resource_pool: t2-medium
   networks:
   - name: private_network
     default: [dns,gateway]
